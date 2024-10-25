@@ -41,6 +41,7 @@ class UKF {
    */
   void UpdateRadar(MeasurementPackage meas_package);
 
+  float previous_timestamp_;
 
   // initially set to false, set to true in first call of ProcessMeasurement
   bool is_initialized_;
@@ -54,11 +55,45 @@ class UKF {
   // state vector: [pos1 pos2 vel_abs yaw_angle yaw_rate] in SI units and rad
   Eigen::VectorXd x_;
 
+  Eigen::VectorXd x_aug;
+
   // state covariance matrix
   Eigen::MatrixXd P_;
 
+  Eigen::MatrixXd P_aug;
+
   // predicted sigma points matrix
   Eigen::MatrixXd Xsig_pred_;
+
+  Eigen::MatrixXd Xsig_aug;
+  
+  Eigen::MatrixXd Xsig;
+
+    // create matrix for sigma points in measurement space
+  Eigen::MatrixXd Zsig;
+
+  Eigen::VectorXd z_;
+
+  // mean predicted measurement
+  Eigen::VectorXd z_pred_;
+
+  // Measurement Selection Matrix H
+  Eigen::MatrixXd H; 
+
+  //  Kalman gain matrix K
+  Eigen::MatrixXd K;
+  
+  // measurement covariance matrix S
+  Eigen::MatrixXd S;
+
+  Eigen::MatrixXd Q_;
+
+  // measurement noise covariance matrix R
+  //Eigen::Matrix3d R; // Radar measurement noise cov matrix
+  Eigen::MatrixXd R; // Radar measurement noise cov matrix
+
+
+  Eigen::MatrixXd Rl; // Lidar measurement noise cov matrix
 
   // time when the state is true, in us
   long long time_us_;
@@ -87,14 +122,25 @@ class UKF {
   // Weights of sigma points
   Eigen::VectorXd weights_;
 
-  // State dimension
-  int n_x_;
+  // // State dimension
+  // int n_x_;
 
-  // Augmented state dimension
-  int n_aug_;
+  // // Augmented state dimension
+  // int n_aug_;
 
-  // Sigma point spreading parameter
-  double lambda_;
+  // // Sigma point spreading parameter
+  // double lambda_;
+
+  void AugmentedSigmaPoints(/*MatrixXd* Xsig_out*/); 
+
+  void SigmaPointPrediction(double delta_t/*MatrixXd* Xsig_out*/);
+
+  void PredictMeanAndCovariance(/*VectorXd* x_out, MatrixXd* P_out*/);
+
+  void PredictRadarMeasurement(/*VectorXd* z_out, MatrixXd* S_out*/);
+
+  void UpdateRadarState(/*VectorXd* x_out, MatrixXd* P_out*/);
+
 };
 
 #endif  // UKF_H
